@@ -6,7 +6,6 @@ import { Link, useNavigate } from "react-router-dom";
 import MyWalletLogo from "../components/MyWalletLogo";
 import { useContext, useEffect, useState } from "react";
 
-
 export default function SignInPage() {
   let [email, setEmail] = useState("");
   let [senha, setSenha] = useState("");
@@ -18,29 +17,9 @@ export default function SignInPage() {
 
   let tokenSessao = localStorage.getItem("token");
 
-  /*useEffect(() => {
-    if (tokenSessao) {
-      const chave = {
-        headers: {
-          Authorization: `Bearer ${tokenSessao}`,
-        },
-      };
-
-      let promisse = axios.get(`${url}/usuario-logado`, chave);
-      promisse.then((resposta) => {
-        setUser({
-          nome: resposta.data.nome,
-          email: resposta.data.email,
-          tokenSessao,
-        });
-        navigate("/home");
-      });
-    }
-  }, []);*/
-
   function login(e) {
     e.preventDefault();
-    setVisivel(true)
+    setVisivel(true);
     requisição_login();
   }
   function requisição_login() {
@@ -54,16 +33,30 @@ export default function SignInPage() {
   }
   function Sucesso(resposta) {
     let token = resposta.data;
-    setUser({ nome: "", email: "", token });
-    localStorage.setItem("token", `${token}`);
-    navigate("/home");
+    const chave = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    let promisse = axios.get(`${url}/usuario-logado`, chave);
+
+    promisse.then((resposta) => {
+      setUser({
+        nome: resposta.data.nome,
+        email: resposta.data.email,
+        tokenSessao,
+      });
+      localStorage.setItem("token", `${token}`);
+      navigate("/home");
+    });
     /*console.log(resposta)*/
   }
   function Fail(resposta) {
     alert(`${resposta.response.data}`);
     setVisivel(false);
   }
-  if(tokenSessao) {
+  if (tokenSessao) {
     useEffect(() => {
       if (tokenSessao) {
         const chave = {
@@ -71,7 +64,7 @@ export default function SignInPage() {
             Authorization: `Bearer ${tokenSessao}`,
           },
         };
-  
+
         let promisse = axios.get(`${url}/usuario-logado`, chave);
         promisse.then((resposta) => {
           setUser({
@@ -83,13 +76,8 @@ export default function SignInPage() {
         });
       }
     }, []);
-    
-    return (
-      <Centered>
-        {<ThreeDots height={'80'} color="#FFFFFF" />}
-      </Centered>
-      
-    )
+
+    return <Centered>{<ThreeDots height={"80"} color="#FFFFFF" />}</Centered>;
   }
 
   if (!tokenSessao) {
@@ -113,7 +101,7 @@ export default function SignInPage() {
           <button type="submit">Entrar</button>
         </form>
 
-        {<ThreeDots height={'40'} color="#FFFFFF"  visible={visivel}/>}
+        {<ThreeDots height={"40"} color="#FFFFFF" visible={visivel} />}
 
         <Link to={"/cadastro"}>Primeira vez? Cadastre-se!</Link>
       </SingInContainer>
@@ -135,4 +123,4 @@ const Centered = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
