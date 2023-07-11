@@ -49,8 +49,8 @@ export default function HomePage() {
             balanço_mov = balanço_mov - Number(resposta.data[i].valor)
           }
         }
-        console.log(balanço_mov)
-        SetBalanço(balanço_mov/2)
+        /*console.log(balanço_mov)*/
+        SetBalanço(balanço_mov)
       });
     });
   }, []);
@@ -85,7 +85,7 @@ export default function HomePage() {
                 </div>
                 <Value data-test="registry-amount" 
                 color={objeto.tipo === "entrada" ? "positivo" : "negativo"}>
-                  {objeto.valor}
+                  {objeto.valor.toFixed(2)}
                 </Value>
               </ListItemContainer>
             )})}
@@ -94,7 +94,7 @@ export default function HomePage() {
           <article>
             <strong>Saldo</strong>
             <Value data-test="total-amount" color={Balanço >= 0 ? "positivo" : "negativo"}> 
-              {Balanço}
+              {Balanço.toFixed(2)}
             </Value>
           </article>
         </TransactionsContainer>
