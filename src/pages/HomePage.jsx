@@ -8,31 +8,53 @@ import { useContext, useState, useEffect } from "react";
 import { AiOutlineMinusCircle, AiOutlinePlusCircle } from "react-icons/ai";
 
 export default function HomePage() {
+  /* Ferramentas da Página */
   const navigate = useNavigate();
   const url = import.meta.env.VITE_API_URL;
   const User = useContext(UserContext).UserData;
   const setUser = useContext(UserContext).SetUserData;
 
+  /* Variaveis de estado */
+  let [Transações, SetTransações] = useState([]);
+  let [Balanço, SetBalanço] = useState(0);
+  let balanço_mov = 0;
+
+  /* Dados externos iniciais: */
   useEffect(() => {
     let tokenSessao = localStorage.getItem("token");
-    const chave = {
-      headers: {
-        Authorization: `Bearer ${tokenSessao}`,
-      },
-    };
+    if (!tokenSessao) {
+      return navigate("/");
+    }
 
-    let promisse = axios.get(`${url}/usuario-logado`, chave);
-
-    promisse.then((resposta) => {
+    const chave = { headers: { Authorization: `Bearer ${tokenSessao}` } };
+    let promisse1 = axios.get(`${url}/usuario-logado`, chave);
+    promisse1.then((resposta) => {
       setUser({
         nome: resposta.data.nome,
         email: resposta.data.email,
         tokenSessao,
       });
+
+      let promisse2 = axios.get(`${url}/transacoes`, {
+        headers: { Authorization: `Bearer ${tokenSessao}` },
+        params: { email: resposta.data.email },
+      });
+      promisse2.then((resposta) => {
+        SetTransações(resposta.data);
+        console.log(resposta.data);
+        for (let i = 0; i < resposta.data.length; i++) {
+          if (resposta.data[i].tipo === "entrada") {
+            balanço_mov = balanço_mov + Number(resposta.data[i].valor)
+          } else {
+            balanço_mov = balanço_mov - Number(resposta.data[i].valor)
+          }
+        }
+        console.log(balanço_mov)
+        SetBalanço(balanço_mov/2)
+      });
     });
-    
   }, []);
-  
+
   if (!User) {
     return <Centered>{<ThreeDots height={"80"} color="#FFFFFF" />}</Centered>;
   }
@@ -54,37 +76,42 @@ export default function HomePage() {
 
         <TransactionsContainer>
           <ul>
-            <ListItemContainer>
-              <div>
-                <span>30/11</span>
-                <strong>Almoço mãe</strong>
-              </div>
-              <Value color={"negativo"}>120,00</Value>
-            </ListItemContainer>
-
-            <ListItemContainer>
-              <div>
-                <span>15/11</span>
-                <strong>Salário</strong>
-              </div>
-              <Value color={"positivo"}>3000,00</Value>
-            </ListItemContainer>
+            {Transações.map((objeto) => {
+              return (
+              <ListItemContainer key={objeto._id}>
+                <div>
+                  <span>{objeto.data}</span>
+                  <strong>{objeto.descricao}</strong>
+                </div>
+                <Value color={objeto.tipo === "entrada" ? "positivo" : "negativo"}>
+                  {objeto.valor}
+                </Value>
+              </ListItemContainer>
+            )})}
           </ul>
 
           <article>
             <strong>Saldo</strong>
-            <Value color={"positivo"}>2880,00</Value>
+            <Value color={Balanço >= 0 ? "positivo" : "negativo"}> {Balanço}</Value>
           </article>
         </TransactionsContainer>
 
         <ButtonsContainer>
-          <button>
+          <button
+            onClick={() => {
+              navigate("/nova-transacao/entrada");
+            }}
+          >
             <AiOutlinePlusCircle />
             <p>
               Nova <br /> entrada
             </p>
           </button>
-          <button>
+          <button
+            onClick={() => {
+              navigate("/nova-transacao/saida");
+            }}
+          >
             <AiOutlineMinusCircle />
             <p>
               Nova <br />
