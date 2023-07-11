@@ -75,7 +75,7 @@ export default function HomePage() {
 
         <TransactionsContainer>
           <ul>
-            {Transações.map((objeto) => {
+            {Transações.toReversed().map((objeto) => {
               return (
               <ListItemContainer key={objeto._id}>
                 <div>
