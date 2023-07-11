@@ -63,8 +63,8 @@ export default function HomePage() {
     return (
       <HomeContainer>
         <Header>
-          <h1>{`Olá, ${User.nome} `}</h1>
-          <Pointer>
+          <h1 data-test="user-name" >{`Olá, ${User.nome} `}</h1>
+          <Pointer data-test="logout">
             <BiExit
               onClick={() => {
                 localStorage.removeItem("token");
@@ -81,9 +81,10 @@ export default function HomePage() {
               <ListItemContainer key={objeto._id}>
                 <div>
                   <span>{objeto.data}</span>
-                  <strong>{objeto.descricao}</strong>
+                  <strong data-test="registry-name" >{objeto.descricao}</strong>
                 </div>
-                <Value color={objeto.tipo === "entrada" ? "positivo" : "negativo"}>
+                <Value data-test="registry-amount" 
+                color={objeto.tipo === "entrada" ? "positivo" : "negativo"}>
                   {objeto.valor}
                 </Value>
               </ListItemContainer>
@@ -92,12 +93,14 @@ export default function HomePage() {
 
           <article>
             <strong>Saldo</strong>
-            <Value color={Balanço >= 0 ? "positivo" : "negativo"}> {Balanço}</Value>
+            <Value data-test="total-amount" color={Balanço >= 0 ? "positivo" : "negativo"}> 
+              {Balanço}
+            </Value>
           </article>
         </TransactionsContainer>
 
         <ButtonsContainer>
-          <button
+          <button data-test="new-income"
             onClick={() => {
               navigate("/nova-transacao/entrada");
             }}
@@ -107,7 +110,7 @@ export default function HomePage() {
               Nova <br /> entrada
             </p>
           </button>
-          <button
+          <button data-test="new-expense"
             onClick={() => {
               navigate("/nova-transacao/saida");
             }}
